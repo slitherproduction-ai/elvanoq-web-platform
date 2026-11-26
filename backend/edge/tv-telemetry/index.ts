@@ -5,7 +5,7 @@
 // em hash e o que aconteceu com o vídeo. Os registros são apagados depois de 7 dias (pg_cron).
 const base = Deno.env.get('SUPABASE_URL')!;
 const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const portalOrigins = new Set(['https://elvanoq-play-portal.slitherproduction.chatgpt.site', 'https://elvanoqplay.app', 'https://titan.elvanoqplay.app', 'http://terminal.local:4173']);
+const portalOrigins = new Set(['https://elvanoq-play-portal.slitherproduction.chatgpt.site', 'https://elvanoqplay.app', 'https://titan.elvanoqplay.app']);
 const PLATFORMS = new Set(['roku', 'lg-webos', 'lg-msx', 'samsung-msx', 'samsung-tizen', 'whale']);
 const EVENTS = new Set(['open_fail', 'stall', 'recovered', 'fatal', 'format_switch', 'source_switch', 'buffering']);
 const TYPES = new Set(['live', 'movie', 'episode', 'catchup', 'other']);

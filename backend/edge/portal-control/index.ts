@@ -6,7 +6,7 @@ import {handleRoku} from './roku-api.ts';
 import {resolveNativeServerCode} from './native-server-code.ts';
 const base = Deno.env.get('SUPABASE_URL');
 const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-const origins = new Set(['https://elvanoq-play-portal.slitherproduction.chatgpt.site','https://elvanoqplay.app','https://titan.elvanoqplay.app','http://terminal.local:4173']);
+const origins = new Set(['https://elvanoq-play-portal.slitherproduction.chatgpt.site','https://elvanoqplay.app','https://titan.elvanoqplay.app']);
 const apk = 'https://github.com/slitherproduction-ai/flixplay/releases/download/v2.17.15/ELVANOQ-v2.17.15-universal.apk';
 class ApiError extends Error { constructor(public status:number, message:string) { super(message); } }
 async function db(path:string, method='GET', body?:unknown, signal?:AbortSignal) {
