@@ -21,7 +21,7 @@ export async function resolveNativeServerCode(b:any, c:any) {
  const access=await db('rpc/portal_code_access','POST',{p_mac:device.mac,p_code:code});
  if(!access.can_connect)throw new ApiError(403,'Código sem acesso. Consulte a renovação ou o responsável.');
  // Reuse the transactional registration and its existing capacity enforcement.
- const result=await db('rpc/portal_code_device_register','POST',{p_mac:device.mac,p_key_hash:keyHash,p_code:code,p_name:device.display_name||(platform==='ios-msx'?'iPhone / iPad (MSX)':platform==='titan'?'TV Titan OS':platform==='vidaa'?'TV VIDAA':lg?'TV LG':'TV Samsung (MSX)'),p_platform:platform,p_version:typeof b.app_version==='string'?b.app_version.slice(0,32):''});
+ const result=await db('rpc/portal_code_device_register','POST',{p_mac:device.mac,p_key_hash:keyHash,p_code:code,p_name:device.display_name||(platform==='ios-msx'?'iPhone / iPad (MSX)':platform==='titan'?'TV Titan OS':platform==='vidaa'?'TV VIDAA':platform==='vega'?'Fire TV (Vega)':platform==='whale'?'TV Whale':lg?'TV LG':'TV Samsung (MSX)'),p_platform:platform,p_version:typeof b.app_version==='string'?b.app_version.slice(0,32):''});
  if(result.code_access?.can_connect!==true||result.license?.can_play!==true)throw new ApiError(403,'Código sem acesso para esta TV.');
  return {server:{code:server.code,host,updated_at:server.updated_at},server_code:code,license:result.license,code_access:result.code_access};
 }
