@@ -1,0 +1,34 @@
+.playlist-page{max-width:1120px;margin:0 auto;padding:40px 32px 56px}
+.playlist-heading{margin:0 0 24px;padding:0}
+.playlist-heading .section-index{font-size:10px;letter-spacing:.18em;margin-bottom:12px}
+.playlist-heading h1{font-size:clamp(28px,3vw,36px);line-height:1.2;letter-spacing:-.045em;white-space:normal;margin:0 0 10px;font-weight:600}
+.playlist-heading>p:last-child{font-size:14px;line-height:1.7;color:var(--muted);max-width:72ch}
+.playlist-workspace{display:grid;grid-template-columns:minmax(0,1fr) 272px;border:1px solid #2a3d53;border-radius:16px;background:#0e1928;overflow:hidden;box-shadow:0 18px 60px #0002}
+body[data-page=adicionar-lista] #playlistForm{width:100%;max-width:none;margin:0;padding:26px 28px;background:transparent;border:0;border-radius:0}
+.playlist-group+.playlist-group{border-top:1px solid var(--line);margin-top:22px;padding-top:22px}
+.playlist-group-title{display:flex;align-items:flex-start;gap:12px;margin-bottom:4px}
+.playlist-group-title>span{display:grid;place-items:center;width:30px;height:30px;flex:none;background:#183347;color:#91e5f3;border:1px solid #2c4c62;border-radius:8px;font-size:11px;font-weight:700}
+.playlist-group-title h2{font-size:16px;line-height:1.4;letter-spacing:-.015em;margin:0 0 4px}
+.playlist-group-title p{font-size:12px;line-height:1.6;color:var(--muted);margin:0}
+body[data-page=adicionar-lista] #playlistForm .form-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}
+body[data-page=adicionar-lista] #playlistForm label:not(.check-label){font-size:12px;margin:16px 0 6px}
+body[data-page=adicionar-lista] #playlistForm :is(input:not([type=checkbox]),select){min-height:40px;height:40px;font-size:13px;padding:8px 10px;margin:0;min-width:0}
+body[data-page=adicionar-lista] #playlistForm .field-note{font-size:11px!important;line-height:1.65!important;margin:10px 0 0!important;max-width:none}
+.playlist-confirm{margin-top:20px;padding-top:4px;border-top:1px solid var(--line)}
+body[data-page=adicionar-lista] #playlistForm .check-label{font-size:12px;line-height:1.7;margin:16px 0;gap:9px}
+body[data-page=adicionar-lista] #playlistForm button[type=submit]{font-size:13px;min-height:40px;margin-top:0}
+.playlist-submit-note{color:#8fa5bb;font-size:11px;line-height:1.65;margin:10px 0 0}
+.playlist-help{min-width:0;background:linear-gradient(150deg,#14273a,#101e2e);padding:28px 22px;border-left:1px solid #2a3d53}
+.playlist-help-label{font-size:9px;letter-spacing:.16em;color:#87cddd;font-weight:700}
+.playlist-help h2{font-size:21px;line-height:1.35;letter-spacing:-.03em;margin:12px 0 22px}
+.playlist-help ol{padding:0;list-style:none;counter-reset:connection;display:grid;gap:20px;margin:0}
+.playlist-help li{position:relative;padding-left:26px;counter-increment:connection}
+.playlist-help li:before{content:counter(connection);position:absolute;left:0;top:0;color:#81cfe1;font-size:11px;font-weight:700;line-height:1.8}
+.playlist-help strong{font-size:12px;line-height:1.6;font-weight:600}
+.playlist-help li p{color:#a2b5c8;font-size:12px;line-height:1.75;margin:5px 0 0}
+.playlist-help-links{border-top:1px solid #2d4358;margin-top:24px;padding-top:20px;display:grid;gap:6px}
+.playlist-help-links a{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px;font-size:11px;line-height:1.6;color:#bcdae8}
+.playlist-help-links a:hover{color:#fff}
+.playlist-help-foot{font-size:10px;line-height:1.75;color:#7f9bb3;border-top:1px solid #2d4358;padding-top:16px;margin-top:20px}
+@media(max-width:900px){.playlist-workspace{grid-template-columns:minmax(0,1fr) 236px}.playlist-page{padding-inline:24px}body[data-page=adicionar-lista] #playlistForm{padding:24px 20px}.playlist-help{padding:26px 18px}body[data-page=adicionar-lista] #playlistForm .form-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:700px){.playlist-page{padding:28px 16px 40px}.playlist-heading h1{font-size:28px}.playlist-heading>p:last-child{font-size:13px}.playlist-workspace{grid-template-columns:minmax(0,1fr);border-radius:12px}body[data-page=adicionar-lista] #playlistForm{padding:22px 18px}body[data-page=adicionar-lista] #playlistForm :is(input:not([type=checkbox]),select){min-height:44px;height:44px;font-size:16px}body[data-page=adicionar-lista] #playlistForm button[type=submit]{min-height:44px}.playlist-help{border-left:0;border-top:1px solid #2a3d53;padding:24px 20px}.playlist-help-links a{min-height:44px;font-size:12px}.playlist-help h2{font-size:20px}.playlist-help ol{gap:16px}}

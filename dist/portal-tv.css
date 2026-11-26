@@ -1,0 +1,24 @@
+:root {
+  --bg:#080e19; --panel:#111d2d; --ink:#f3f7ff;
+  --muted:#a9bad0; --line:#2c4059; --lime:#78e2f5;
+  --tv-raised:#192a40; --tv-field:#0b1625;
+}
+body {background:radial-gradient(ellipse at 85% 0,#142940 0,transparent 42rem),var(--bg)}
+.grain {display:none}
+.site-header,footer {background:#0b1524;border-color:var(--line)}
+.header-cta,.portal-menu:not([hidden]) {border-color:#47627e;border-radius:8px;background:var(--tv-field)}
+.hero-art {background:radial-gradient(ellipse at center,#214b65 0,#142940 38%,#0b1625 70%,var(--bg) 100%)}
+.orbit {border-color:#355773}
+.orb-glow {background:radial-gradient(ellipse,rgba(120,226,245,.22),transparent 68%)}
+.primary {background:#8fe7f7;color:#08202b;border-radius:9px}
+.primary:hover {background:#b4f2fc;color:#08202b}
+:is(.form-card,.platform-card,.portal-step,.compatibility-help,.portal-bulk,.security-home) {
+  background:var(--panel);border:1px solid var(--line);border-radius:12px
+}
+.platform-card:hover {border-color:#527b9a}
+.portal-platform-jump a,.portal-tip {background:#14253a}
+:is(input:not([type="checkbox"]):not([type="radio"]),select,textarea) {background:var(--tv-field);color:var(--ink);border-color:#47627e;border-radius:8px}
+input:is([type="checkbox"],[type="radio"]) {accent-color:var(--lime)}
+:where(a,button,input,select,textarea,summary):focus-visible {outline:2px solid #8fe7f7;outline-offset:3px}
+video {max-width:100%}
+@media (prefers-reduced-motion:reduce) {html {scroll-behavior:auto}}

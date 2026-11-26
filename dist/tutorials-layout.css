@@ -1,0 +1,7 @@
+.tutorial-platforms{display:flex;gap:10px;flex-wrap:wrap;max-width:1224px;margin:26px auto 0;padding:0 5%}
+.tutorial-platforms a{padding:10px 18px;min-height:44px;border:1px solid var(--line);border-radius:999px;background:var(--panel);font-size:13px}
+.tutorial-platforms a:hover{border-color:#78e2f5}
+#lg,#samsung{scroll-margin-top:20px}
+.lg-tutorial-layout{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:20px;align-items:start}
+.lg-tutorial-layout li{line-height:1.7;margin-bottom:14px;font-size:14px}
+@media(max-width:760px){.lg-tutorial-layout{grid-template-columns:minmax(0,1fr)}}

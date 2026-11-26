@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+let handler,mode='config',role='paid',calls=[],reserveCalls=0;
+globalThis.Deno={env:{get:k=>({SUPABASE_URL:'https://test.local',SUPABASE_SERVICE_ROLE_KEY:'test-service',PAGHIPER_API_KEY:'test-api',PAGHIPER_TOKEN:'test-token',PAGHIPER_ENABLED:'true'})[k]},serve:f=>handler=f};
+const paymentAccess='a'.repeat(64);
+const mac='02:CA:FE:71:00:09',deviceKey='test-device-only',id='10000000-0000-4000-8000-000000000009';
+const keyHash=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(deviceKey))).toString('hex');
+const order={id,mac,status:'pending',transaction_id:'test-transaction',amount_cents:2490};
+let badAmount=false,badOrder=false;
+globalThis.fetch=async(url,opts={})=>{calls.push({url,body:opts.body?JSON.parse(opts.body):null});let data=[];
+if(url.includes('portal_managed_devices'))data=[{key_hash:keyHash,active:true}];
+else if(url.includes('portal_pix_orders'))data=opts.method==='PATCH'?[{...order,...JSON.parse(opts.body)}]:[order];
+else if(url.includes('rpc/portal_pix_reserve_public')){reserveCalls++;data={...order,new_order:mode==='new',status:mode==='unknown'?'unknown':'pending',emv:'test-pix'};}
+else if(url.includes('rpc/portal_pix_apply'))data={...order,applied_at:'2026-10-21T00:00:00Z'};
+else if(url.endsWith('/notification/'))data={status_request:{result:'success',transaction_id:order.transaction_id,order_id:badOrder?'wrong-order':id,value_cents:badAmount?'1':'2490',value_cents_paid:'2490',status:role}};
+else if(url.endsWith('/status/'))data={status_request:{result:'success',value_cents:'2490',status:role}};
+else if(url.endsWith('/create/'))data={pix_create_request:{result:'success',transaction_id:'test-transaction',order_id:id,value_cents:'2490',pix_code:{emv:'test-pix'}}};
+else throw new Error('unexpected URL');return new Response(JSON.stringify(data),{status:200});};
+const fetchBeforeRateLimit=globalThis.fetch;globalThis.fetch=async(u,o={})=>String(u).includes('rpc/portal_rate_limit')?new Response('true'):fetchBeforeRateLimit(u,o);await import('./edge/paghiper-payments/index.ts');
+async function call(body,webhook=false){const r=await handler(new Request('https://test.local/functions/v1/paghiper-payments'+(webhook?'/webhook':''),{method:'POST',headers:{'Content-Type':webhook?'application/x-www-form-urlencoded':'application/json'},body:webhook?new URLSearchParams(body):JSON.stringify(body)}));return {status:r.status,body:await r.json()};}
+assert.equal((await call({action:'config'})).body.enabled,true);
+assert.equal((await call({action:'create',mac,payment_access:'bad'})).status,400);
+const create={action:'create',mac,payment_access:paymentAccess,payer_name:'Pessoa de Teste',payer_email:'test@example.invalid',payer_cpf_cnpj:'00000000191',consent:true};
+assert.equal((await call({...create,consent:false})).status,400);assert.equal(reserveCalls,0);
+mode='new';assert.equal((await call({...create,amount_cents:1})).status,200);
+assert.equal(calls.find(c=>c.url.includes('portal_pix_reserve_public')).body.p_mac,mac);
+const sent=calls.find(c=>c.url.endsWith('/create/')).body;assert.equal(sent.items[0].price_cents,'2490');assert.equal(sent.notification_url,'https://test.local/functions/v1/paghiper-payments/webhook');
+mode='pending';let before=calls.filter(c=>c.url.endsWith('/create/')).length;assert.equal((await call(create)).status,200);assert.equal(calls.filter(c=>c.url.endsWith('/create/')).length,before);
+mode='unknown';assert.equal((await call(create)).status,409);
+const notify={apiKey:'test-api',transaction_id:order.transaction_id,notification_id:'test-notification',source_api:'https://pix.paghiper.com'};
+assert.equal((await call({...notify,source_api:'https://attacker.invalid'},true)).status,403);
+badAmount=true;assert.equal((await call(notify,true)).status,409);badAmount=false;
+badOrder=true;assert.equal((await call(notify,true)).status,409);badOrder=false;
+role='pending';assert.equal((await call(notify,true)).status,200);assert.equal(calls.at(-1).body.p_status,'pending');
+role='paid';assert.equal((await call(notify,true)).status,200);assert.equal(calls.at(-1).body.p_paid,2490);
+assert(!JSON.stringify((await call({action:'status',mac,payment_access:paymentAccess,order_id:id})).body).includes('test-token'));
+console.log('PASS: Pix creation, fixed amount, consent, MAC/payment session without device key, duplicate reservation, unknown emission, spoofed webhook, order/value validation, paid vs pending and secret isolation');

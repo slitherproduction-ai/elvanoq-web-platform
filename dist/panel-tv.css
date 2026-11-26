@@ -1,0 +1,25 @@
+/* TV-inspired palette, scoped to signed-in panel pages. */
+body[data-view="panel"]{
+ --bg:#080e19;--panel:#111d2d;--ink:#f3f7ff;--muted:#a9bad0;--line:#2c4059;--lime:#78e2f5;
+ background:radial-gradient(ellipse at 85% 0,#142940 0,transparent 42rem),var(--bg);
+}
+[data-view="panel"] :is(.site-header,.admin-sidebar){background:#0b1524;border-color:var(--line)}
+[data-view="panel"] .admin-sidebar a{border-radius:8px}
+[data-view="panel"] .admin-sidebar a[aria-current="page"]{background:#17334a;color:var(--ink);box-shadow:inset 3px 0 #78e2f5}
+[data-view="panel"] :is(.device-card,.management-block,.panel-bulk,.account-panel){background:#111d2d;border:1px solid var(--line);border-radius:12px}
+[data-view="panel"] :is(.device-summary,.management-block>summary):hover{background:#192a40}
+[data-view="panel"] .device-summary-identity strong{color:var(--ink)}
+[data-view="panel"] .device-summary-identity>span{font-variant-numeric:tabular-nums;color:var(--muted)}
+[data-view="panel"] .platform-badge{background:#182f45;border-color:#3c5a76;color:#c5e5ff}
+[data-view="panel"] .device-status-badge{background:#233047;color:#dbe7f7}
+[data-view="panel"] .device-status-badge[data-state="active"]{background:#14352f;border-color:#326c5d;color:#a2f3d1}
+[data-view="panel"] .device-status-badge[data-state="blocked"]{background:#382030;border-color:#744359;color:#ffbdcd}
+[data-view="panel"] .device-status-badge[data-state="pending"]{background:#342b20;border-color:#6f593b;color:#ffe1a2}
+[data-view="panel"] :is(input:not([type="checkbox"]),select,textarea){background:#0b1625;color:var(--ink);border-color:#47627e;border-radius:8px}
+[data-view="panel"] .primary{background:#8fe7f7;color:#08202b;border:1px solid #8fe7f7;border-radius:9px}
+[data-view="panel"] .primary:hover{background:#b4f2fc;color:#08202b}
+[data-view="panel"] .danger-button{color:#ffd1da;background:#3a1e2d;border:1px solid #a95971;border-radius:8px}
+[data-view="panel"] .danger-button:hover:not(:disabled){background:#502839}
+[data-view="panel"] .panel-bulk-item:has(input:checked)+.device-card{border-color:#6edcf0;box-shadow:inset 0 0 0 1px #6edcf0}
+[data-view="panel"] :is(a,button,summary,input,select,textarea):focus-visible{outline:2px solid #8fe7f7;outline-offset:3px}
+[data-view="panel"] .device-summary:focus-visible{outline-offset:-3px}

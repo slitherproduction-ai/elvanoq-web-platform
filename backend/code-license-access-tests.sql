@@ -1,0 +1,33 @@
+begin;
+do $$
+declare actor uuid; a text:='02:FE:ED:CA:00:91'; b text:='02:FE:ED:CA:00:92'; code text:='qa-code-full-access';result jsonb; paid jsonb; blocked boolean:=false;deadline timestamptz:=now()+interval '10 days';
+begin
+ select user_id into actor from public.portal_staff where role='admin' and active and not must_change_password limit 1;
+ if actor is null then raise exception 'test requires admin fixture';end if;
+ insert into public.portal_server_codes(code,host,active,updated_by,validity,expires_at) values(code,'https://example.invalid',true,actor,'annual',deadline);
+ insert into public.portal_managed_devices(mac,key_hash,display_name,server_code) values(a,repeat('a',64),'QA expired trial',code);
+ insert into public.portal_device_licenses(mac,trial_started_at,trial_expires_at) values(a,now()-interval '10 days',now()-interval '3 days');
+ result:=public.portal_effective_license(a);
+ if not (result->>'can_play')::boolean or result->>'status'<>'licensed' or (result->>'expires_at')::timestamptz<>deadline then raise exception 'valid code did not override expired trial';end if;
+ result:=public.portal_code_device_register(b,repeat('b',64),code,'QA no trial','android','test');
+ if not (result->'license'->>'can_play')::boolean or exists(select 1 from public.portal_device_licenses where mac=b) then raise exception 'registration started trial';end if;
+ begin perform public.portal_pix_reserve_public(a,repeat('c',64));exception when others then if sqlerrm='CODE_ACCESS_ACTIVE' then blocked:=true;else raise;end if;end;
+ if not blocked then raise exception 'charged active code';end if;
+ update public.portal_server_codes set expires_at=now()-interval '1 day' where portal_server_codes.code='qa-code-full-access';
+ if (public.portal_effective_license(a)->>'can_play')::boolean or (public.portal_effective_license(b)->>'can_play')::boolean then raise exception 'expiry did not block';end if;
+ paid:=public.portal_license_confirm_payment(a,'qa-code-full-access-payment',2490,actor);
+ if not (public.portal_effective_license(a)->>'can_play')::boolean or (public.portal_effective_license(b)->>'can_play')::boolean then raise exception 'individual payment scope';end if;
+ update public.portal_code_device_grants set active=false where mac=a;
+ if (public.portal_effective_license(a)->>'can_play')::boolean then raise exception 'revoked payment grant still works';end if;
+ update public.portal_server_codes set validity='lifetime',expires_at=null where portal_server_codes.code='qa-code-full-access';
+ result:=public.portal_effective_license(b);
+ if not (result->>'can_play')::boolean or result->>'status'<>'lifetime' or result->>'expires_at' is not null then raise exception 'lifetime code';end if;
+ update public.portal_server_codes set revoked=true,restricted_at=clock_timestamp() where portal_server_codes.code='qa-code-full-access';
+ if (public.portal_effective_license(a)->>'can_play')::boolean or (public.portal_effective_license(b)->>'can_play')::boolean then raise exception 'revocation did not block';end if;
+ update public.portal_server_codes set revoked=false where portal_server_codes.code='qa-code-full-access';
+ update public.portal_managed_devices set active=false where mac=b;
+ if (public.portal_effective_license(b)->>'can_play')::boolean then raise exception 'device suspension bypassed';end if;
+ update public.portal_managed_devices set server_code=null,active=true where mac=b;
+ if public.portal_effective_license(b)->>'status'<>'not_activated' then raise exception 'direct host rules changed';end if;
+end $$;
+rollback;

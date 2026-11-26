@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 290">
+<defs><linearGradient id="screen" x2="1" y2="1"><stop stop-color="#142951"/><stop offset="1" stop-color="#080e1b"/></linearGradient></defs>
+<rect x="49" y="35" width="382" height="205" rx="12" fill="#0a101d" stroke="#70809b" stroke-width="3"/>
+<rect x="59" y="45" width="362" height="185" rx="7" fill="url(#screen)"/>
+<rect x="210" y="76" width="60" height="60" rx="15" fill="#273e69"/>
+<path d="M234 92v28l21-14z" fill="#fff"/>
+<text x="240" y="164" fill="#fff" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="700">Media Station X</text>
+<text x="240" y="191" fill="#b7c7df" text-anchor="middle" font-family="Arial,sans-serif" font-size="15">ELVANOQ Play · LG</text>
+<path d="m134 240-26 19m238-19 26 19" stroke="#70809b" stroke-width="5" stroke-linecap="round"/>
+</svg>

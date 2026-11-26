@@ -1,0 +1,36 @@
+begin;
+do $$
+declare a uuid;did uuid;rid uuid;ident text;client text;visual text;m text;before_row jsonb;after_row jsonb;pending text:=repeat('0',64);k1 text:=repeat('a',64);k2 text:=repeat('b',64);ok boolean;
+begin
+ select user_id into a from public.portal_staff where role='admin' and active and not must_change_password limit 1;
+ if a is null then raise exception 'Synthetic test needs an existing active admin';end if;
+ ident:=md5(gen_random_uuid()::text)||md5(gen_random_uuid()::text);
+ client:=md5(gen_random_uuid()::text)||md5(gen_random_uuid()::text);
+ visual:='ROKU-'||upper(substr(md5(gen_random_uuid()::text),1,8))||'-'||upper(substr(md5(gen_random_uuid()::text),1,8));
+ m:='02:'||upper(substr(ident,1,2)||':'||substr(ident,3,2)||':'||substr(ident,5,2)||':'||substr(ident,7,2)||':'||substr(ident,9,2));
+ insert into public.portal_managed_devices(mac,key_hash,display_name,platform) values(m,k1,'Synthetic reason-only reset','webos') returning id into did;
+ insert into public.portal_webos_devices(lgudid_hash,managed_device_id,device_key_hash) values(ident,did,k1);
+ select to_jsonb(d)-'key_hash' into before_row from public.portal_managed_devices d where id=did;
+ perform public.portal_device_rebind_platform(did,a,pending,'Synthetic reset test',false);
+ if (select key_hash from public.portal_managed_devices where id=did)<>pending or (select device_key_hash from public.portal_webos_devices where lgudid_hash=ident)<>pending then raise exception 'Reset not pending';end if;
+ if not public.portal_native_binding_claim('webos',ident,k2) then raise exception 'LG claim failed';end if;
+ if (select key_hash from public.portal_managed_devices where id=did)<>k2 or (select device_key_hash from public.portal_webos_devices where lgudid_hash=ident)<>k2 then raise exception 'LG mapping divergence';end if;
+ if public.portal_native_binding_claim('webos',ident,k1) then raise exception 'LG old key replaced new key';end if;
+ select to_jsonb(d)-'key_hash' into after_row from public.portal_managed_devices d where id=did;
+ if before_row<>after_row then raise exception 'LG license/status/device metadata changed';end if;
+ if (select count(*) from public.portal_device_binding_events where device_id=did and reason='Synthetic reset test')<>1 then raise exception 'Missing reset audit';end if;
+ perform public.portal_roku_operation('register',client,visual,k1,null,'{"name":"Synthetic reset Roku"}');
+ select id into rid from public.portal_roku_devices where client_hash=client;
+ select to_jsonb(d)-'key_hash' into before_row from public.portal_roku_devices d where id=rid;
+ perform public.portal_roku_operation('admin',null,null,pending,a,jsonb_build_object('id',rid,'operation','rebind','reason','Synthetic Roku reset test','restore',false));
+ if not public.portal_native_binding_claim('roku',client,k2,visual) then raise exception 'Roku claim failed';end if;
+ if public.portal_native_binding_claim('roku',client,k1,visual) then raise exception 'Roku old key replaced new key';end if;
+ if public.portal_native_binding_claim('roku',ident,k1,visual) then raise exception 'Wrong native identity accepted';end if;
+ select to_jsonb(d)-'key_hash' into after_row from public.portal_roku_devices d where id=rid;
+ if before_row<>after_row then raise exception 'Roku license/trial/status changed';end if;
+ perform public.portal_roku_operation('admin',null,null,pending,a,jsonb_build_object('id',rid,'operation','rebind','reason','Synthetic blocked reset','restore',false));
+ update public.portal_roku_devices set active=false where id=rid;
+ if public.portal_native_binding_claim('roku',client,k1,visual) then raise exception 'Blocked Roku claimed';end if;
+ if has_function_privilege('anon','public.portal_native_binding_claim(text,text,text,text)','execute') or has_function_privilege('authenticated','public.portal_native_binding_claim(text,text,text,text)','execute') then raise exception 'Claim publicly callable';end if;
+end $$;
+rollback;

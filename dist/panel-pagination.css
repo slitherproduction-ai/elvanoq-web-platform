@@ -1,0 +1,8 @@
+body.admin-layout .panel-pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px 14px;margin-top:16px;padding:14px 0;border-top:1px solid #293b51;font-size:12px;color:#a8bad0}
+body.admin-layout .panel-pagination>span:first-child{margin-right:auto;color:#dce8f5}
+body.admin-layout .panel-pagination label{display:flex;align-items:center;gap:8px;margin:0;font-size:12px}
+body.admin-layout .panel-pagination select{width:auto;min-width:70px;min-height:36px;padding:7px 10px;font-size:12px}
+body.admin-layout .panel-pagination button{width:auto;min-height:36px;padding:8px 12px;font-size:12px}
+body.admin-layout .panel-pagination button:disabled{opacity:.4;cursor:default}
+body.admin-layout .panel-pagination[hidden]{display:none}
+@media(max-width:650px){body.admin-layout .panel-pagination{justify-content:space-between;gap:12px}body.admin-layout .panel-pagination>span:first-child{flex-basis:100%}body.admin-layout .panel-pagination label{flex-basis:100%;justify-content:space-between}body.admin-layout .panel-pagination button,body.admin-layout .panel-pagination select{min-height:44px}}
