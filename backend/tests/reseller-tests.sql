@@ -1,0 +1,34 @@
+begin;
+do $$
+declare admin_id uuid;a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();did uuid;native_id uuid;rid uuid;k text:=encode(sha256('synthetic-key'::bytea),'hex');h text:=encode(sha256(gen_random_uuid()::text::bytea),'hex');v text;outcome jsonb;until_first timestamptz;req uuid:=gen_random_uuid();test_mac text;d2 uuid;
+begin
+ select user_id into admin_id from public.portal_staff where role='admin' and active and not must_change_password limit 1;if admin_id is null then raise exception 'TEST_ADMIN_MISSING';end if;
+ insert into auth.users(id,email) values(a,a||'@test.invalid'),(b,b||'@test.invalid');insert into public.portal_staff(user_id,role,active,display_name) values(a,'reseller',true,'Synthetic A'),(b,'reseller',true,'Synthetic B');
+ perform public.portal_partner_plan_save(admin_id,a,'Anual 2','annual',now()+interval '1 year',2);perform public.portal_partner_plan_save(admin_id,b,'Anual 1','annual',now()+interval '1 year',1);
+ test_mac:='02:'||upper(substr(h,1,2)||':'||substr(h,3,2)||':'||substr(h,5,2)||':'||substr(h,7,2)||':'||substr(h,9,2));
+ perform public.portal_staff_device_operation(a,'bind','managed',null,jsonb_build_object('mac',test_mac,'key_hash',k,'name','Synthetic Android'));
+ select id into did from public.portal_managed_devices where portal_managed_devices.mac=test_mac;
+ if not exists(select 1 from public.portal_managed_devices where id=did and reseller_id=a and created_by=a) then raise exception 'AUTO_OWNER_CREATOR_FAILED';end if;
+ outcome:=public.portal_webos_device_register(h,k,'test','webos');native_id:=(outcome->>'device_id')::uuid;
+ perform public.portal_staff_device_operation(a,'bind','managed',native_id,jsonb_build_object('key_hash',k,'name','Synthetic LG'));
+ v:='ROKU-'||upper(substr(h,1,8))||'-'||upper(substr(h,9,8));perform public.portal_roku_operation('register',h,v,k,null,'{"name":"Synthetic Roku"}');
+ begin perform public.portal_staff_device_operation(a,'bind','roku',null,jsonb_build_object('device_code',v,'key_hash',k,'name','Synthetic Roku'));raise exception 'CAPACITY_NOT_ENFORCED';exception when others then if sqlerrm<>'RESELLER_CAPACITY_OR_PLAN' then raise;end if;end;
+ if (select device_count from public.portal_staff where user_id=a)<>2 then raise exception 'COUNT_FAILED';end if;
+ perform public.portal_device_assign(did,b,admin_id);
+ if not exists(select 1 from public.portal_managed_devices where id=did and reseller_id=b and created_by=a) then raise exception 'ASSIGN_CREATOR_FAILED';end if;
+ begin perform public.portal_device_assign(native_id,b,admin_id);raise exception 'TRANSFER_LIMIT_NOT_ENFORCED';exception when others then if sqlerrm<>'RESELLER_CAPACITY_OR_PLAN' then raise;end if;end;
+ begin perform public.portal_staff_device_operation(a,'renew','managed',did,jsonb_build_object('reason','Unauthorized test','request_id',gen_random_uuid()));raise exception 'CROSS_OWNER_RENEW';exception when others then if sqlerrm<>'STAFF_DEVICE_FORBIDDEN' then raise;end if;end;
+ outcome:=public.portal_staff_device_operation(b,'renew','managed',did,jsonb_build_object('reason','Synthetic renewal','request_id',req));until_first:=(outcome->>'license_until')::timestamptz;
+ outcome:=public.portal_staff_device_operation(b,'renew','managed',did,jsonb_build_object('reason','Synthetic renewal','request_id',req));if not (outcome->>'duplicate')::boolean or (outcome->>'license_until')::timestamptz<>until_first then raise exception 'RENEW_NOT_IDEMPOTENT';end if;
+ perform public.portal_staff_device_operation(b,'playlist','managed',did,'{"name":"Synthetic list","kind":"xtream","credentials":{"host":"https://test.invalid","username":"synthetic","password":"synthetic"},"origin":"https://test.invalid"}');
+ begin perform public.portal_staff_device_operation(a,'playlist','managed',did,'{}');raise exception 'CROSS_OWNER_PLAYLIST';exception when others then if sqlerrm<>'STAFF_DEVICE_FORBIDDEN' then raise;end if;end;
+ perform public.portal_staff_device_operation(a,'bind','roku',null,jsonb_build_object('device_code',v,'key_hash',k,'name','Synthetic Roku'));select id into rid from public.portal_roku_devices where device_code=v;
+ perform public.portal_staff_device_operation(a,'playlist','roku',rid,'{"name":"Synthetic Roku list","kind":"m3u","credentials":{"url":"https://test.invalid/list.m3u"},"origin":"https://test.invalid"}');
+ perform public.portal_staff_device_operation(a,'renew','roku',rid,jsonb_build_object('reason','Synthetic Roku renewal','request_id',gen_random_uuid()));
+ perform public.portal_staff_device_operation(a,'delete','roku',rid);if exists(select 1 from public.portal_roku_devices where id=rid) then raise exception 'ROKU_DELETE_FAILED';end if;
+ if (select device_count from public.portal_staff where user_id=a)<>1 then raise exception 'DELETE_COUNT_FAILED';end if;
+ perform public.portal_partner_plan_save(admin_id,b,'Expired','annual',now()-interval '1 day',1);
+ begin perform public.portal_staff_device_operation(b,'renew','managed',did,jsonb_build_object('reason','Expired plan test','request_id',gen_random_uuid()));raise exception 'EXPIRED_PLAN_RENEW';exception when others then if sqlerrm<>'PARTNER_PLAN_EXPIRED' then raise;end if;end;
+ perform public.portal_staff_device_operation(b,'delete','managed',did);if (select device_count from public.portal_staff where user_id=b)<>0 then raise exception 'MANAGED_DELETE_COUNT_FAILED';end if;
+end $$;
+rollback;

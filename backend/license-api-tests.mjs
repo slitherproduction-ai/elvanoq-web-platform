@@ -1,0 +1,41 @@
+import assert from 'node:assert/strict';
+let handler;
+globalThis.Deno={env:{get:k=>k==='SUPABASE_URL'?'https://test.local':'qa-service'},serve:f=>handler=f};
+let state={role:'admin',active:true,mac:'02:CA:FE:71:00:03',device_key:'qa-test-key-only'};
+const digest=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(state.device_key))).toString('hex');
+let rpcCalls=[];
+globalThis.fetch=async(url,options={})=>{
+ let data=[];
+ if(url.endsWith('/auth/v1/user'))data={id:'qa-user',email:'qa@example.invalid'};
+ else if(url.includes('/portal_staff'))data=[{role:state.role,active:state.active}];
+ else if(url.includes('/portal_managed_devices'))data=[{mac:state.mac,key_hash:digest}];
+ else if(url.includes('/rpc/')){rpcCalls.push({url,body:JSON.parse(options.body)});data={status:'trial',can_play:true};}
+ return new Response(JSON.stringify(data),{status:200});
+};
+const fetchBeforeRateLimit=globalThis.fetch;globalThis.fetch=async(u,o={})=>String(u).includes('rpc/portal_rate_limit')?new Response('true'):fetchBeforeRateLimit(u,o);await import('./portal-api.ts');
+async function call(body,auth=true){const r=await handler(new Request('https://test.local',{method:'POST',headers:{'Content-Type':'application/json',...(auth?{Authorization:'Bearer qa-jwt'}:{})},body:JSON.stringify(body)}));return {status:r.status,body:await r.json()};}
+assert.equal((await call({action:'license-status',mac:state.mac,device_key:'incorrect'},false)).status,403);
+assert.equal((await call({action:'license-status',mac:state.mac,device_key:state.device_key},false)).status,200);
+assert.ok(rpcCalls.at(-1).url.endsWith('portal_license_status'));
+assert.equal((await call({action:'license-activate',mac:state.mac,device_key:state.device_key,trial_started_at:'2000-01-01'},false)).status,200);
+assert.deepEqual(rpcCalls.at(-1).body,{p_mac:state.mac});
+assert.equal((await call({action:'license-confirm-payment'},false)).status,401);
+state.role='reseller';assert.equal((await call({action:'license-confirm-payment'})).status,403);
+state.role='admin';state.active=false;assert.equal((await call({action:'license-confirm-payment'})).status,403);state.active=true;
+assert.equal((await call({action:'license-confirm-payment',mac:state.mac,payment_reference:'test-payment',amount_cents:-1})).status,400);
+assert.equal((await call({action:'license-confirm-payment',mac:state.mac,payment_reference:'test-payment',amount_cents:2490,p_actor:'attacker'})).status,200);
+assert.equal(rpcCalls.at(-1).body.p_actor,'qa-user');
+assert.equal((await call(null)).status,400);
+assert.equal((await call({action:'license-set-lifetime'},false)).status,401);
+state.role='reseller';const before=rpcCalls.length;
+assert.equal((await call({action:'license-set-lifetime',mac:state.mac,lifetime:true,reason:'Parceiro tenta conceder'})).status,403);
+assert.equal((await call({action:'license-set-lifetime',mac:state.mac,lifetime:false,reason:'Parceiro tenta remover'})).status,403);
+assert.equal(rpcCalls.length,before);
+state.role='admin';
+assert.equal((await call({action:'license-set-lifetime',mac:state.mac,lifetime:'true',reason:'Motivo válido'})).status,400);
+assert.equal((await call({action:'license-set-lifetime',mac:state.mac,lifetime:true,reason:'abc'})).status,400);
+assert.equal((await call({action:'license-set-lifetime',mac:state.mac,lifetime:true,reason:'Concessão de teste',p_actor:'attacker'})).status,200);
+assert.deepEqual(rpcCalls.at(-1).body,{p_mac:state.mac,p_lifetime:true,p_actor:'qa-user',p_reason:'Concessão de teste'});
+assert.equal((await call({action:'license-set-lifetime',mac:state.mac,lifetime:false,reason:'Remoção de teste'})).status,200);
+assert.equal(rpcCalls.at(-1).body.p_lifetime,false);
+console.log('API: autorização, identidade do ator, validação e concessão/remoção vitalícia passaram');

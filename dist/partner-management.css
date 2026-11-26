@@ -1,0 +1,10 @@
+.partner-plan-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px;grid-column:1/-1}
+.partner-plan-fields>p{grid-column:1/-1}
+.partner-plan-fields label{margin:0!important}
+.partner-plan-fields :is(input,select){width:100%;min-height:40px;padding:9px 11px;font:inherit;background:#0b1421;color:var(--ink);border:1px solid #3c526b;border-radius:8px}
+.partner-plan-summary{display:flex;align-items:center;flex-wrap:wrap;gap:10px 20px;border:1px solid #345069;background:#132638;border-radius:12px;padding:16px 18px;margin:18px 0;font-size:13px}
+.partner-plan-summary>span{margin-left:auto;font-size:18px;color:#9ee9f5;font-weight:700}
+.partner-plan-summary small{color:#abc1d4}.partner-plan-summary p{width:100%;font-size:12px;color:#97b0c6;line-height:1.6;margin:0}
+#view-listas form{max-width:760px}#view-listas form>label:first-child{grid-column:1/-1}
+#staffList .device-card>strong+small{margin:6px 0}
+@media(max-width:700px){.partner-plan-fields{grid-template-columns:minmax(0,1fr)}.partner-plan-fields :is(input,select){font-size:16px;min-height:44px}.partner-plan-summary>span{margin-left:0;width:100%}}

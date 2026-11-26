@@ -1,0 +1,26 @@
+.compatibility-page .compatibility-help {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(20px, 4vw, 44px);
+  margin-top: clamp(20px, 4vw, 38px);
+  padding: clamp(16px, 3vw, 28px);
+}
+.compatibility-help h2 {
+  font-size: clamp(21px, 3vw, 28px);
+  line-height: 1.25;
+  margin: 8px 0;
+}
+.compatibility-help p { margin: 0; line-height: 1.6; }
+.compatibility-help .text-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 6px;
+  white-space: normal;
+}
+@media (max-width: 700px) {
+  .compatibility-page .compatibility-help {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}

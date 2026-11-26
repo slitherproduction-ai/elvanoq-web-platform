@@ -1,0 +1,129 @@
+/* Shared proportions, intrinsic sizing and predictable responsive layouts. */
+:root{--ui-control:40px;--ui-gap:16px}
+main :is(section,article,form,fieldset),.section-heading>*{min-width:0}
+.page-title{white-space:normal;overflow-wrap:break-word;letter-spacing:-.045em}
+.section-heading{align-items:start;column-gap:32px;row-gap:16px}
+.section-heading .page-title{margin:0;font-size:clamp(30px,3.6vw,46px);line-height:1.15}
+.section-heading>p,.section-heading>div>p{font-size:14px;line-height:1.75}
+.workspace-section{padding-block:36px}
+body:not([data-view=panel]) .form-card{max-width:840px;padding:24px;border-radius:12px}
+body:not([data-view=panel]) .form-card>h2{margin:0 0 12px;font-size:21px}
+body:not([data-view=panel]) .form-card>p{line-height:1.75}
+body:not([data-view=panel]) :is(.form-card,.account-panel) :is(input:not([type=checkbox]):not([type=radio]),select,textarea){box-sizing:border-box;width:100%;max-width:100%;min-height:var(--ui-control);padding:9px 11px;font:400 14px/1.4 var(--font);border-radius:8px;margin:0}
+body:not([data-view=panel]) :is(#playlistPlatform,#devicePlatform){min-height:var(--ui-control);margin:0}
+body:not([data-view=panel]) :is(.form-card,.account-panel) label:not(.check-label){display:block;font-size:12px;line-height:1.5;margin:16px 0 6px}
+.form-card .form-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}
+.form-card .check-label{margin:18px 0;max-width:72ch;font-size:13px;line-height:1.65}
+.form-card .check-label input{width:18px;height:18px;min-height:18px;margin:2px 0;flex:none;accent-color:#78e2f5}
+body:not([data-view=panel]) :is(.form-card,.account-panel,.downloader-address) button.primary{width:auto;max-width:100%;min-height:40px;padding:9px 16px;line-height:1.5;font-size:13px;white-space:normal}
+body:not([data-view=panel]) .form-card button[type=submit]{margin-top:8px}
+.form-card .field-note{max-width:76ch}
+.form-card .message{font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+#pixForm{margin-top:20px;border-top:1px solid var(--line);padding-top:4px}
+#pixResult{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+#pixResult h3{font-size:18px;margin-bottom:10px}
+#pixCode{display:block;width:100%;max-width:100%;min-height:100px;resize:vertical;margin-bottom:12px;overflow-wrap:anywhere}
+#pixQr{display:block;max-width:100%;height:auto;margin:16px 0}
+#pixQr[hidden]{display:none}
+body[data-view=login] .account{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:48px;max-width:1200px;margin:auto;padding:48px 5%;align-items:start}
+body[data-view=login] .account-panel{padding:26px;margin:0;border-radius:12px}
+body[data-view=login] .account-intro .page-title{font-size:clamp(32px,4vw,48px);line-height:1.15;white-space:normal}
+body[data-view=login] .account-decoration{max-width:250px;margin-top:24px}
+body[data-view=login] .account-panel h3{font-size:22px}
+body[data-view=login] .password-wrap{position:relative;margin:0}
+body[data-view=login] .password-wrap input{padding-right:82px}
+body[data-view=login] #togglePassword{position:absolute;inset:0 0 0 auto;height:40px;min-width:72px;font-size:12px;background:transparent;border:0;color:#bde9f5;margin:0;padding:0 10px}
+body[data-view=login] .panel-note{line-height:1.6;letter-spacing:.08em}
+.download-section{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 40px;align-items:start}
+.download-section>.portal-tip{grid-column:1/-1;width:100%;max-width:none;margin:0}
+.download-card{min-width:0;padding:24px;border-radius:12px}
+.download-card h3{font-size:24px;margin:18px 0 10px}
+.download-card .direct-apk-action{margin:18px 0}
+.apk-release-info{padding:14px 0;margin-bottom:14px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.apk-release-info p{font-size:13px;line-height:1.7}
+.apk-release-info button{margin-top:12px}
+.downloader-layout{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px}
+.downloader-address{min-width:0;padding:24px}
+.downloader-number{max-width:100%;box-sizing:border-box}
+.downloader-steps{gap:16px;margin-block:24px}
+.downloader-steps li{min-width:0;padding:20px;gap:14px}
+.platform-card{padding:24px;min-width:0}
+.platform-copy h2{font-size:22px;line-height:1.3;margin-block:12px}
+.platform-card-top{flex-wrap:wrap;gap:12px}
+.platform-copy p,.platform-copy li{line-height:1.7;overflow-wrap:break-word}
+.platform-state{white-space:normal}
+.platform-actions{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.portal-platform-jump{gap:8px;margin-top:18px}
+.portal-platform-jump a{min-height:38px;padding:7px 12px;font-size:12px}
+body[data-page=tutoriais] .section-heading>h1{grid-column:1/-1}
+body[data-page=tutoriais] .section-heading>h2:not(.page-title){font-size:23px;line-height:1.3;letter-spacing:-.03em}
+body[data-page=tutoriais] .tutorial-layout{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:24px;align-items:start}
+body[data-page=tutoriais] .tutorial-layout>.form-card{width:100%;max-width:none;margin:0!important;height:auto}
+body[data-page=tutoriais] .form-card ol{padding-left:22px;margin:16px 0}
+body[data-page=tutoriais] .form-card li{font-size:14px;line-height:1.75;margin-bottom:14px;overflow-wrap:break-word}
+body[data-page=tutoriais] video{max-width:300px!important;box-shadow:none;filter:none;isolation:isolate}
+.legal-main{width:100%;max-width:960px;padding:40px 24px 64px}
+.legal-main h1{font-size:clamp(30px,4vw,44px);line-height:1.2;white-space:normal}
+.legal-main .lead{font-size:16px}
+.legal-main section h2{font-size:20px;margin-bottom:12px}
+.legal-main p,.legal-main li{font-size:14px;line-height:1.8}
+.legal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.legal-card{padding:20px;min-width:0}
+.legal-card strong{font-size:17px;line-height:1.4}
+.legal-card span{font-size:13px}
+.legal-nav{gap:8px}.legal-nav a{display:inline-flex;align-items:center;min-height:40px;padding:8px 12px;line-height:1.5}
+.security-highlights>div,.security-content>section{min-width:0}
+.security-intro h1{white-space:normal;font-size:clamp(32px,4.5vw,56px)}
+.security-content p{max-width:78ch}
+footer{align-items:center;gap:16px 24px}
+footer a{font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+footer>span{line-height:1.6}
+[hidden]{display:none!important}
+@media(max-width:900px){body[data-page=tutoriais] .tutorial-layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:1000px){
+ body[data-view=login] .account{gap:28px;grid-template-columns:minmax(0,1fr) minmax(0,400px)}
+ .downloader-layout{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:700px){
+ :root{--ui-control:44px}
+ .workspace-section{padding:28px 5%}
+ .section-heading{grid-template-columns:minmax(0,1fr);gap:14px;margin:18px 0 24px}
+ .section-heading .page-title{font-size:32px}
+ body:not([data-view=panel]) .form-card{padding:18px}
+ .form-card .form-grid{grid-template-columns:minmax(0,1fr);gap:0}
+ body:not([data-view=panel]) :is(.form-card,.account-panel) :is(input:not([type=checkbox]):not([type=radio]),select,textarea){font-size:16px}
+ body:not([data-view=panel]) :is(.form-card,.account-panel,.downloader-address) button.primary{min-height:44px}
+ body[data-view=login] .account{grid-template-columns:minmax(0,1fr);padding:28px 5%;gap:24px}
+ body[data-view=login] .account-decoration{display:none}
+ body[data-view=login] .account-panel{padding:20px}
+ body[data-view=login] #togglePassword{height:44px}
+ .download-section{grid-template-columns:minmax(0,1fr);gap:24px}
+ .download-section>.portal-tip{grid-column:auto}
+ .download-card,.downloader-address,.platform-card{padding:20px}
+ .downloader-heading{align-items:start;gap:12px}
+ body[data-page=tutoriais] .tutorial-layout{grid-template-columns:minmax(0,1fr);gap:18px}
+ body[data-page=tutoriais] video{max-width:280px!important}
+ .legal-main{padding:28px 20px 48px}
+ .legal-grid{grid-template-columns:minmax(0,1fr)}
+ .legal-nav a{min-height:44px}
+ footer{padding:24px 5%;gap:14px 20px}
+ footer>span{flex-basis:100%}
+}
+@media print{.legal-main{max-width:none}.legal-main p,.legal-main li{font-size:11pt}}
+/* Management search and action groups share the same compact proportions. */
+body[data-view=panel] #serverCodeSearch{max-width:420px;min-height:40px;font-size:14px;padding:9px 11px}
+body[data-view=panel] .management-filters :is(input:not([type=checkbox]),select){min-height:40px;padding:9px 11px;font:400 13px/1.4 var(--font);border-radius:8px}
+body[data-view=panel] .device-expanded{padding:18px;min-width:0}
+body[data-view=panel] .device-summary-identity{min-width:0}
+body[data-view=panel] .device-summary-identity :is(strong,span){word-break:normal;overflow-wrap:anywhere}
+@media(max-width:700px){
+ body[data-view=panel] .management-filters :is(input:not([type=checkbox]),select),body[data-view=panel] #serverCodeSearch{min-height:44px;font-size:16px}
+ body[data-view=panel] .device-expanded{padding:14px}
+}
+.compatibility-intro h1{font-size:clamp(32px,4vw,48px);line-height:1.16;white-space:normal}
+@media(max-width:700px){.portal-platform-jump a{min-height:44px}}
+/* Center the standalone public forms, including the login's hidden intro layout. */
+body[data-view=login] .account{display:block;max-width:600px;margin-inline:auto}
+body[data-view=login] .account-panel{width:100%;max-width:440px;margin-inline:auto}
+body[data-page=adicionar-lista] #playlistForm,
+body[data-page=ativacao] .form-card{margin-inline:auto}

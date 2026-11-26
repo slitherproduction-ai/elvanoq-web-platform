@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080e19">
+  
+  <title>Adicionar lista IPTV ao dispositivo | ELVANOQ Play</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap"><link rel="stylesheet" href="/style.css?v=device-cards2">
+<link rel="icon" href="/favicon.ico?v=elvanoq1" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=elvanoq1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=elvanoq1"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=elvanoq1"/>
+<meta name="description" content="Envie sua lista M3U ou Xtream ao ELVANOQ Play pelo MAC do Android ou código da TV LG, Samsung ou Roku. Sem criar conta de cliente.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="ELVANOQ Play">
+<meta property="og:title" content="Adicionar lista IPTV ao dispositivo | ELVANOQ Play">
+<meta property="og:description" content="Envie sua lista M3U ou Xtream ao ELVANOQ Play pelo MAC do Android ou código da TV LG, Samsung ou Roku. Sem criar conta de cliente.">
+<meta property="og:url" content="https://elvanoqplay.app/adicionar-lista/">
+<meta property="og:image" content="https://elvanoqplay.app/assets/portal-social.png">
+<meta property="og:image:alt" content="ELVANOQ Play — Sua mídia. Sua experiência.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://elvanoqplay.app/adicionar-lista/">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png?v=elvanoq1">
+<link rel="stylesheet" href="/portal-refresh.css?v=1">
+<link rel="stylesheet" href="/portal-tv.css?v=1">
+<link rel="stylesheet" href="/portal-density.css?v=1">
+<link rel="stylesheet" href="/studio.css?v=1">
+<link rel="stylesheet" href="/portal-layout.css?v=2">
+<link rel="stylesheet" href="/playlist-layout.css?v=1">
+<link rel="stylesheet" href="/observatory.css?v=1">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Início", "item": "https://elvanoqplay.app/"}, {"@type": "ListItem", "position": 2, "name": "Adicionar lista IPTV ao dispositivo", "item": "https://elvanoqplay.app/adicionar-lista/"}]}</script>
+</head>
+<body data-page="adicionar-lista">
+  <div class="grain" aria-hidden="true"></div>
+  <a class="portal-skip" href="#conteudo">Ir para o conteúdo</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="ELVANOQ Play, início"><img fetchpriority="high" width="900" height="300" decoding="async" src="/assets/ELVANOQ_wordmark_white_transparent.webp" alt="ELVANOQ — Sua mídia. Sua experiência." class="brand-image"></a>
+    <button class="portal-menu" type="button" aria-controls="portal-main-nav" aria-expanded="false" hidden><span aria-hidden="true">☰</span> Menu</button><nav id="portal-main-nav" aria-label="Navegação principal"><a href="/">Início</a><a href="/adicionar-lista/" aria-current="page">Adicionar lista</a><a href="/compatibilidade/">Compatibilidade</a><a href="/tutoriais/">Tutoriais</a><a href="/download/">Baixar APK</a><a href="/ativacao/">Ativação</a><a href="/suporte/">Suporte</a></nav>
+    <a class="header-cta" href="/revendedores/">Área do parceiro <span aria-hidden="true">↗</span></a>
+  </header>
+<main id="conteudo" class="playlist-page">
+<header class="playlist-heading"><p class="section-index">ADICIONAR LISTA</p><h1>Conecte sua lista ao aplicativo.</h1><p id="playlistIntro">Informe o aparelho e os dados da sua lista. Depois, sincronize no ELVANOQ Play.</p></header>
+<div class="playlist-workspace">
+<form id="playlistForm" class="form-card playlist-editor">
+<section class="playlist-group" aria-labelledby="playlist-device-title"><div class="playlist-group-title"><span aria-hidden="true">01</span><div><h2 id="playlist-device-title">Identifique seu aparelho</h2><p>Use a identificação exibida no aplicativo.</p></div></div>
+<div class="form-grid"><div><label for="playlistPlatform">Plataforma</label><select id="playlistPlatform" aria-describedby="lgPlaylistInstructions"><option value="android">Android / Fire TV</option><option value="webos">TV LG</option><option value="samsung">TV Samsung</option><option value="titan">TV Titan OS</option><option value="whale">TV Whale OS</option><option value="ios">iPhone / iPad (Media Station X)</option><option value="roku">Roku</option></select></div>
+<div id="playlistAndroidIdentity"><label for="deviceMac">MAC do dispositivo</label><input id="deviceMac" placeholder="AA:BB:CC:DD:EE:FF" autocomplete="off" required maxlength="17"></div>
+<div id="playlistLgIdentity" hidden><label id="playlistCodeLabel" for="playlistTvCode">Código da TV</label><input id="playlistTvCode" disabled placeholder="LG-, SM-, WH-, IOS-, TT- ou ROKU-" maxlength="22" pattern="(LG|SM|IOS|TT|VD|WH)-[0-9A-Fa-f]{12}|ROKU-[A-Za-z0-9]{8}-[A-Za-z0-9]{8}" autocomplete="off" autocapitalize="characters" spellcheck="false"><p id="rokuPrefillNotice" class="field-note" role="status" aria-live="polite" hidden>Código da TV preenchido automaticamente</p></div>
+<div hidden><label id="playlistKeyLabel" for="deviceKey">Chave do dispositivo</label><input id="deviceKey" disabled type="password" autocomplete="off" maxlength="128"></div></div>
+<p id="lgPlaylistInstructions" class="field-note" hidden>Abra primeiro o aplicativo na TV e copie o código exibido.</p><p id="androidPlaylistNote" class="field-note">Inclui Android TV e Google TV. Informe somente o MAC exibido no aplicativo.</p></section>
+<section class="playlist-group" aria-labelledby="playlist-source-title"><div class="playlist-group-title"><span aria-hidden="true">02</span><div><h2 id="playlist-source-title">Adicione sua lista</h2><p>Utilize os dados fornecidos pelo seu provedor.</p></div></div>
+<div class="form-grid"><div><label for="playlistName">Nome da lista</label><input id="playlistName" placeholder="Ex.: TV da sala" required maxlength="100"></div><div><label for="playlistKind">Tipo de conexão</label><select id="playlistKind"><option value="m3u">URL M3U</option><option value="xtream">Xtream Codes</option></select></div></div>
+<div id="m3uFields"><label for="playlistUrl">URL da lista M3U</label><input id="playlistUrl" type="url" placeholder="https://seu-provedor.com/lista.m3u" required maxlength="4096"><p class="field-note">Links get.php compatíveis são reconhecidos como Xtream Codes automaticamente.</p></div>
+<div id="xtreamFields" hidden><label for="xtreamHost">Servidor Xtream</label><input id="xtreamHost" type="url" placeholder="https://seu-provedor.com"><div class="form-grid"><div><label for="xtreamUser">Usuário</label><input id="xtreamUser" autocomplete="off" maxlength="256"></div><div><label for="xtreamPassword">Senha</label><input id="xtreamPassword" type="password" autocomplete="off" maxlength="1024"></div></div></div></section>
+<div class="playlist-confirm"><label class="check-label"><input id="playlistConsent" type="checkbox" required> Tenho autorização para usar esta lista e este dispositivo. O envio substitui a lista anterior.</label><div id="playlistMessage" class="message" role="status" hidden></div><button class="primary" type="submit">Cadastrar dispositivo e salvar lista ↗</button><p class="playlist-submit-note">Nenhuma nova chave será gerada. As regras da licença são mantidas.</p></div>
+</form>
+<aside class="playlist-help" aria-label="Orientações de conexão"><span class="playlist-help-label">COMO FUNCIONA</span><h2>Do Portal para sua tela.</h2><ol><li><strong>Abra o aplicativo</strong><p>Encontre o MAC ou código do aparelho. Nas TVs, abra o app antes de enviar a lista.</p></li><li><strong>Salve sua lista aqui</strong><p>Informe a identificação e os dados da lista do seu provedor.</p></li><li><strong>Sincronize no app</strong><p>Abra “Listas Salvas” no ELVANOQ Play para carregar o conteúdo.</p></li></ol><div class="playlist-help-links"><strong>Precisa de ajuda?</strong><a href="/tutoriais/">Tutoriais para Samsung e LG <span aria-hidden="true">↗</span></a><a href="/compatibilidade/">Instalar no seu aparelho <span aria-hidden="true">↗</span></a><a href="/suporte/">Falar com o suporte <span aria-hidden="true">↗</span></a></div><p class="playlist-help-foot">Player independente. O ELVANOQ Play não fornece listas nem conteúdo.</p></aside>
+</div></main>
+  <footer class="portal-footer"><div class="footer-brand"><a class="brand" href="/" aria-label="ELVANOQ Play, início"><img src="/assets/ELVANOQ_wordmark_white_transparent.webp" width="150" height="50" alt="ELVANOQ Play" loading="lazy" decoding="async"></a><p>Sua mídia. Sua experiência.</p><small>Player independente. Nenhum conteúdo incluso.</small></div><nav aria-label="Explore o Portal"><strong>EXPLORE</strong><a href="/compatibilidade/">Encontre seu dispositivo</a><a href="/adicionar-lista/">Adicionar lista</a><a href="/ativacao/">Ativar ou renovar</a><a href="/tutoriais/">Tutoriais de instalação</a><a href="/download/">Download do aplicativo</a></nav><nav aria-label="Suporte e transparência"><strong>SUPORTE E TRANSPARÊNCIA</strong><a href="/suporte/">Central de ajuda</a><a href="/seguranca/">Segurança</a><a href="/privacidade">Política de privacidade</a><a href="/legal/">Termos e documentos</a><a href="/revendedores/">Área do parceiro</a></nav><div class="footer-bottom"><span>© 2026 ELVANOQ Play</span><span>O conteúdo é de responsabilidade do seu provedor.</span><a href="#conteudo">Voltar ao início ↑</a></div></footer>
+  <script src="/config.js"></script><script src="/device-filters.js?v=1" defer></script><script src="/mac-format.js" defer></script><script src="/security.js" defer></script><script src="/app.js?v=device-filter2" defer></script><script src="/roku-format.js?v=whale1" defer></script><script src="/roku-prefill.js?v=1" defer></script><script src="/tv-prefill.js?v=whale1" defer></script>
+<script src="/navigation.js?v=1" defer></script><script src="/portal-menu.js?v=1" defer></script><script src="/observatory.js?v=1" defer></script></body>
+</html>
