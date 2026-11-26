@@ -6,7 +6,7 @@ import {handleRoku} from './roku-api.ts';
 import {resolveNativeServerCode} from './native-server-code.ts';
 const base = Deno.env.get('SUPABASE_URL');
 const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-const origins = new Set(['https://elvanoq-play-portal.slitherproduction.chatgpt.site','https://elvanoqplay.app','https://titan.elvanoqplay.app','http://terminal.local:4173']);
+const origins = new Set(['https://elvanoq-play-portal.slitherproduction.chatgpt.site','https://elvanoqplay.app','https://titan.elvanoqplay.app']);
 const apk = 'https://github.com/slitherproduction-ai/flixplay/releases/download/v2.17.15/ELVANOQ-v2.17.15-universal.apk';
 class ApiError extends Error { constructor(public status:number, message:string) { super(message); } }
 async function db(path:string, method='GET', body?:unknown, signal?:AbortSignal) {
@@ -71,9 +71,9 @@ Deno.serve(async(req:Request)=>{
   }
   if(action==='webos-playlist'){
    const code=String(b.tv_code||'').trim().toUpperCase(),key=text(b.device_key,128);
-   if(!/^(LG|SM|IOS|TT|VD)-[0-9A-F]{12}$/.test(code)||!/^\d{6,128}$/.test(key))throw new ApiError(400,'Informe o código da TV (LG-…, SM-… ou VD-…) e a chave numérica exibidos na tela.');
+   if(!/^(LG|SM|IOS|TT|VD|VG|WH)-[0-9A-F]{12}$/.test(code)||!/^\d{6,128}$/.test(key))throw new ApiError(400,'Informe o código da TV (LG-…, SM-…, VD-…, VG-… ou WH-…) e a chave numérica exibidos na tela.');
    const allowed=await db('rpc/portal_rate_limit','POST',{p_bucket:await hash('webos-playlist:'+code),p_limit:30,p_seconds:900});if(allowed!==true)throw new ApiError(429,'Muitas tentativas. Aguarde alguns minutos.');
-   const links=await db('portal_webos_devices?lgudid_hash=like.'+code.split('-')[1].toLowerCase()+'*&platform=eq.'+(code.startsWith('TT-')?'titan':code.startsWith('IOS-')?'ios-msx':code.startsWith('SM-')?'samsung-msx':code.startsWith('VD-')?'vidaa':'webos')+'&select=managed_device_id,device_key_hash');
+   const links=await db('portal_webos_devices?lgudid_hash=like.'+code.split('-')[1].toLowerCase()+'*&platform=eq.'+(code.startsWith('TT-')?'titan':code.startsWith('IOS-')?'ios-msx':code.startsWith('SM-')?'samsung-msx':code.startsWith('VD-')?'vidaa':code.startsWith('VG-')?'vega':code.startsWith('WH-')?'whale':'webos')+'&select=managed_device_id,device_key_hash');
    if(links.length!==1||links[0].device_key_hash!==await hash(key))throw new ApiError(403,'Código da TV ou chave inválidos. Abra o aplicativo na TV e confira os dados.');
    const rows=await db('portal_managed_devices?id=eq.'+links[0].managed_device_id+'&select=id,mac,key_hash,active');const device=rows[0];
    if(!device||device.key_hash!==await hash(key)||!device.active)throw new ApiError(403,'TV indisponível ou desativada. Procure o responsável.');
@@ -98,11 +98,11 @@ Deno.serve(async(req:Request)=>{
   // Portal checkout uses only the visual prefix plus key; the full digest stays server-side.
   if(action==='webos-checkout'){
    const code=String(b.tv_code||'').trim().toUpperCase(),key=text(b.device_key,128);
-   if(!/^(LG|SM|IOS|TT|VD)-[0-9A-F]{12}$/.test(code)||!/^\d{6,128}$/.test(key))throw new ApiError(400,'Informe o código da TV (LG-…, SM-… ou VD-…) e a chave numérica exibidos na tela.');
+   if(!/^(LG|SM|IOS|TT|VD|VG|WH)-[0-9A-F]{12}$/.test(code)||!/^\d{6,128}$/.test(key))throw new ApiError(400,'Informe o código da TV (LG-…, SM-…, VD-…, VG-… ou WH-…) e a chave numérica exibidos na tela.');
    if(!['validate','create','status'].includes(b.operation))throw new ApiError(400,'Operação inválida.');
    const quota=await db('rpc/portal_rate_limit','POST',{p_bucket:await hash('webos-checkout:'+b.operation+':'+code),p_limit:b.operation==='status'?180:30,p_seconds:900});
    if(quota!==true)throw new ApiError(429,'Muitas tentativas. Aguarde alguns minutos.');
-   const links=await db('portal_webos_devices?lgudid_hash=like.'+code.split('-')[1].toLowerCase()+'*&platform=eq.'+(code.startsWith('TT-')?'titan':code.startsWith('IOS-')?'ios-msx':code.startsWith('SM-')?'samsung-msx':code.startsWith('VD-')?'vidaa':'webos')+'&select=managed_device_id,device_key_hash');
+   const links=await db('portal_webos_devices?lgudid_hash=like.'+code.split('-')[1].toLowerCase()+'*&platform=eq.'+(code.startsWith('TT-')?'titan':code.startsWith('IOS-')?'ios-msx':code.startsWith('SM-')?'samsung-msx':code.startsWith('VD-')?'vidaa':code.startsWith('VG-')?'vega':code.startsWith('WH-')?'whale':'webos')+'&select=managed_device_id,device_key_hash');
    // Reject ambiguous prefixes rather than risk charging the wrong TV.
    if(links.length!==1||links[0].device_key_hash!==await hash(key))throw new ApiError(403,'Código da TV ou chave inválidos. Abra o aplicativo na TV e confira os dados.');
    const rows=await db('portal_managed_devices?id=eq.'+links[0].managed_device_id+'&select=id,mac,key_hash,active');const device=rows[0];
@@ -119,7 +119,7 @@ Deno.serve(async(req:Request)=>{
    return reply(result);
   }
   if(action==='server-code-resolve'){
-   if(['samsung-msx','lg-msx','ios-msx','webos','titan','vidaa'].includes(b.platform) && b.device_id)return reply(await resolveNativeServerCode(b,{db,hash,ApiError,webosId,text,serverCode,serverHost}));
+   if(['samsung-msx','lg-msx','ios-msx','webos','titan','vidaa','vega','whale'].includes(b.platform) && b.device_id)return reply(await resolveNativeServerCode(b,{db,hash,ApiError,webosId,text,serverCode,serverHost}));
    const code=serverCode(b.code);const rows=await db('portal_server_codes?code=eq.'+encodeURIComponent(code)+'&select=code,host,updated_at,validity,expires_at,active,revoked');
    if(!rows[0])throw new ApiError(404,'Código de servidor não encontrado.');
    let mac=null;
@@ -133,7 +133,7 @@ Deno.serve(async(req:Request)=>{
   if(action==='webos-device-register'){
    const id=webosId(b.device_id),key=text(b.device_key,128);
    if(key.length<6)throw new ApiError(400,'Informe a chave de identificação do aplicativo.');
-   const platform=b.platform==='titan'?'titan':b.platform==='ios-msx'?'ios-msx':b.platform==='samsung-msx'?'samsung-msx':b.platform==='vidaa'?'vidaa':'webos';
+   const platform=b.platform==='titan'?'titan':b.platform==='ios-msx'?'ios-msx':b.platform==='samsung-msx'?'samsung-msx':b.platform==='vidaa'?'vidaa':b.platform==='vega'?'vega':b.platform==='whale'?'whale':'webos';
    const result=platform==='titan'?await db('rpc/portal_titan_device_register','POST',{p_lgudid_hash:id,p_key_hash:await hash(key),p_app_version:typeof b.app_version==='string'?b.app_version.slice(0,32):null}):await db('rpc/portal_webos_device_register','POST',{p_lgudid_hash:id,p_key_hash:await hash(key),p_app_version:typeof b.app_version==='string'?b.app_version.slice(0,32):null,p_platform:platform});
    return reply(result);
   }
@@ -281,7 +281,7 @@ Deno.serve(async(req:Request)=>{
    if(admin){const usage=await db('portal_server_code_usage?select=code,device_count');const counts=new Map(usage.map((u:any)=>[u.code,u.device_count]));for(const c of serverCodes)c.device_count=counts.get(c.code)??0;}
    const serverHosts=admin?await db('portal_server_hosts?select=origin,code&order=origin.asc'):[];
    const webosLinks=ids.length?await db('portal_webos_devices?managed_device_id=in.('+ids.join(',')+')&select=managed_device_id,lgudid_hash,platform'):[];
-   const visualByMac=new Map();for(const link of webosLinks){const d=devices.find((v:any)=>v.id===link.managed_device_id);if(d){const titan=link.platform==='titan',samsung=link.platform==='samsung-msx',ios=link.platform==='ios-msx',vidaa=link.platform==='vidaa';const visual=(titan?'TT-':ios?'IOS-':samsung?'SM-':vidaa?'VD-':'LG-')+link.lgudid_hash.slice(0,12).toUpperCase();visualByMac.set(d.mac,visual);d.visual_code=visual;d.platform=titan?'titan':ios?'ios':samsung?'samsung':vidaa?'vidaa':'webos';delete d.mac;}}
+   const visualByMac=new Map();for(const link of webosLinks){const d=devices.find((v:any)=>v.id===link.managed_device_id);if(d){const titan=link.platform==='titan',samsung=link.platform==='samsung-msx',ios=link.platform==='ios-msx',vidaa=link.platform==='vidaa',vega=link.platform==='vega',whale=link.platform==='whale';const visual=(titan?'TT-':ios?'IOS-':samsung?'SM-':vidaa?'VD-':vega?'VG-':whale?'WH-':'LG-')+link.lgudid_hash.slice(0,12).toUpperCase();visualByMac.set(d.mac,visual);d.visual_code=visual;d.platform=titan?'titan':ios?'ios':samsung?'samsung':vidaa?'vidaa':vega?'vega':whale?'whale':'webos';delete d.mac;}}
    for(const record of [...audit,...pixOrders])if(visualByMac.has(record.mac)){record.visual_code=visualByMac.get(record.mac);delete record.mac;}
    const rokuDevices=await db('portal_roku_devices?select=id,device_code,platform,display_name,reseller_id,created_by,active,bound_at,trial_started_at,created_at,last_seen_at,server_code'+(admin?'':'&reseller_id=eq.'+user.id)+'&order=created_at.desc');
    if(rokuDevices.length)lists.push(...await db('portal_roku_playlists?select=device_id,name,kind,updated_at&device_id=in.('+rokuDevices.map((d:any)=>d.id).join(',')+')'));
@@ -292,10 +292,10 @@ Deno.serve(async(req:Request)=>{
   }
   if(action==='webos-device-bind'){
    const code=String(b.tv_code||'').trim().toUpperCase(),key=text(b.device_key,128);
-   if(!/^(LG|SM|IOS|TT|VD)-[0-9A-F]{12}$/.test(code)||!/^\d{6,128}$/.test(key))throw new ApiError(400,'Informe o código e a chave numérica exibidos na TV.');
+   if(!/^(LG|SM|IOS|TT|VD|VG|WH)-[0-9A-F]{12}$/.test(code)||!/^\d{6,128}$/.test(key))throw new ApiError(400,'Informe o código e a chave numérica exibidos na TV.');
    const allowed=await db('rpc/portal_rate_limit','POST',{p_bucket:await hash('native-staff-bind:'+user.id),p_limit:40,p_seconds:900});
    if(allowed!==true)throw new ApiError(429,'Muitas tentativas. Aguarde alguns minutos.');
-   const links=await db('portal_webos_devices?lgudid_hash=like.'+code.split('-')[1].toLowerCase()+'*&platform=eq.'+(code.startsWith('TT-')?'titan':code.startsWith('IOS-')?'ios-msx':code.startsWith('SM-')?'samsung-msx':code.startsWith('VD-')?'vidaa':'webos')+'&select=managed_device_id,device_key_hash');
+   const links=await db('portal_webos_devices?lgudid_hash=like.'+code.split('-')[1].toLowerCase()+'*&platform=eq.'+(code.startsWith('TT-')?'titan':code.startsWith('IOS-')?'ios-msx':code.startsWith('SM-')?'samsung-msx':code.startsWith('VD-')?'vidaa':code.startsWith('VG-')?'vega':code.startsWith('WH-')?'whale':'webos')+'&select=managed_device_id,device_key_hash');
    const digest=await hash(key);
    if(links.length!==1||links[0].device_key_hash!==digest)throw new ApiError(403,'Código ou chave inválidos. Abra primeiro o aplicativo na TV para registrar o aparelho.');
    const rows=await db('portal_managed_devices?id=eq.'+links[0].managed_device_id+'&select=id,key_hash,active,reseller_id,archived_at');const device=rows[0];

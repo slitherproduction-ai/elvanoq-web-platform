@@ -5,7 +5,7 @@ export async function saveVisualPlaylist(b:any,c:any){
  const platform=b.action==='playlist'?'android':b.action==='webos-playlist'?'webos':'roku';
  let identity:string;
  if(platform==='android')identity=macOf(b.mac);
- else{identity=String(platform==='webos'?b.tv_code||'':b.deviceCode||'').replace(/\s/g,'').toUpperCase();if(!(platform==='webos'?/^(LG|SM|IOS|TT|VD)-[A-F0-9]{12}$/:/^ROKU-[A-Z0-9]{8}-[A-Z0-9]{8}$/).test(identity))throw new ApiError(400,'Confira o código exibido na TV.');}
+ else{identity=String(platform==='webos'?b.tv_code||'':b.deviceCode||'').replace(/\s/g,'').toUpperCase();if(!(platform==='webos'?/^(LG|SM|IOS|TT|VD|VG|WH)-[A-F0-9]{12}$/:/^ROKU-[A-Z0-9]{8}-[A-Z0-9]{8}$/).test(identity))throw new ApiError(400,'Confira o código exibido na TV.');}
  const allowed=await db('rpc/portal_rate_limit','POST',{p_bucket:await hash('visual-playlist:'+platform+':'+identity),p_limit:30,p_seconds:900});
  if(allowed!==true)throw new ApiError(429,'Muitas tentativas. Aguarde alguns minutos.');
  if(!['m3u','xtream'].includes(b.kind))throw new ApiError(400,'Tipo de lista inválido.');
@@ -19,7 +19,7 @@ export async function saveVisualPlaylist(b:any,c:any){
  }else{
   let mac=identity,keyHash=UNCLAIMED_PLAYLIST_KEY;
   if(platform==='webos'){
-   const links=await db('portal_webos_devices?lgudid_hash=like.'+identity.split('-')[1].toLowerCase()+'*&platform=eq.'+(identity.startsWith('TT-')?'titan':identity.startsWith('IOS-')?'ios-msx':identity.startsWith('SM-')?'samsung-msx':identity.startsWith('VD-')?'vidaa':'webos')+'&select=managed_device_id,device_key_hash');
+   const links=await db('portal_webos_devices?lgudid_hash=like.'+identity.split('-')[1].toLowerCase()+'*&platform=eq.'+(identity.startsWith('TT-')?'titan':identity.startsWith('IOS-')?'ios-msx':identity.startsWith('SM-')?'samsung-msx':identity.startsWith('VD-')?'vidaa':identity.startsWith('VG-')?'vega':identity.startsWith('WH-')?'whale':'webos')+'&select=managed_device_id,device_key_hash');
    if(links.length!==1)throw new ApiError(403,'Abra primeiro o aplicativo na TV para registrar um código válido.');
    const rows=await db('portal_managed_devices?id=eq.'+links[0].managed_device_id+'&select=mac,key_hash,active');const d=rows[0];
    if(!d||d.key_hash!==links[0].device_key_hash||!d.active)throw new ApiError(403,'TV indisponível ou desativada. Procure o responsável.');mac=d.mac;keyHash=d.key_hash;

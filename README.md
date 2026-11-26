@@ -27,6 +27,13 @@ Abra http://localhost:8080. A autenticação e as operações reais dependem dos
 node --test tests/*.test.cjs
 ```
 
+Depois de alterar qualquer CSS/JS de `dist/`, atualize as versões de cache das páginas (o `?v=` passa a ser um hash do conteúdo, igual em todas as páginas):
+
+```sh
+python3 tools/cache-bust.py          # aplica
+python3 tools/cache-bust.py --check  # só verifica
+```
+
 Há testes adicionais em `backend/`, com requisitos próprios e alguns dependentes de banco ou da estrutura histórica. Consulte cada arquivo antes de executá-lo.
 
 ## Publicação e colaboração
