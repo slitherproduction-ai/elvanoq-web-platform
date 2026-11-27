@@ -5,9 +5,9 @@
 // em hash e o que aconteceu com o vídeo. Os registros são apagados depois de 7 dias (pg_cron).
 const base = Deno.env.get('SUPABASE_URL')!;
 const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const portalOrigins = new Set(['https://elvanoq-play-portal.slitherproduction.chatgpt.site', 'https://elvanoqplay.app', 'https://titan.elvanoqplay.app']);
+const portalOrigins = new Set(['https://elvanoq-play-portal.slitherproduction.chatgpt.site', 'https://elvanoqplay.app', 'https://titan.elvanoqplay.app', 'http://terminal.local:4173']);
 const PLATFORMS = new Set(['roku', 'lg-webos', 'lg-msx', 'samsung-msx', 'samsung-tizen', 'whale']);
-const EVENTS = new Set(['open_fail', 'stall', 'recovered', 'fatal', 'format_switch', 'source_switch', 'buffering']);
+const EVENTS = new Set(['open_fail', 'stall', 'recovered', 'fatal', 'format_switch', 'source_switch', 'buffering', 'session_start', 'session_playing', 'session_end', 'watch_time']);
 const TYPES = new Set(['live', 'movie', 'episode', 'catchup', 'other']);
 const FORMATS = new Set(['hls', 'ts', 'mp4', 'mkv', 'other']);
 
@@ -28,7 +28,7 @@ function corsHeaders(req: Request) {
 async function db(path: string, method = 'GET', body?: unknown) {
   const r = await fetch(base + '/rest/v1/' + path, {
     method,
-    headers: { apikey: service, Authorization: 'Bearer ' + service, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    headers: { apikey: service, Authorization: 'Bearer ' + service, 'Content-Type': 'application/json', Prefer: 'return=minimal,resolution=ignore-duplicates' },
     body: body === undefined ? undefined : JSON.stringify(body)
   });
   if (!r.ok) throw new ApiError(502, 'Falha no banco: ' + (await r.text()).slice(0, 200));
@@ -56,6 +56,17 @@ function int(v: unknown, min: number, max: number) {
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : 0;
 }
 
+// Only structured diagnostics: no raw browser messages, URLs or credentials.
+function identifier(v: unknown) { const s = String(v ?? ''); return /^[a-zA-Z0-9_-]{8,80}$/.test(s) ? s : null; }
+function nullableInt(v: unknown, max: number) { return v == null || !Number.isFinite(Number(v)) ? null : int(v, 0, max); }
+function occurredAt(v: unknown) {
+  const now = Date.now(), at = Date.parse(String(v ?? ''));
+  return Number.isFinite(at) && at >= now - 7 * 86400000 && at <= now + 300000 ? new Date(at).toISOString() : null;
+}
+function safeDetail(v: unknown) {
+  return clip(v, 500).replace(/https?:\/\/[^\s]+/gi, '[url removida]').replace(/(?:password|passwd|token|username|authorization|senha)\s*[=:]\s*[^\s,;]+/gi, '[credencial removida]').slice(0,120);
+}
+
 async function report(b: any) {
   const platform = clip(b.platform, 20);
   if (!PLATFORMS.has(platform)) throw new ApiError(400, 'Plataforma inválida.');
@@ -78,10 +89,17 @@ async function report(b: any) {
       content_type: TYPES.has(type) ? type : 'other',
       stream_format: format === '' ? '' : FORMATS.has(format) ? format : 'other',
       event, duration_ms: int(e.duration_ms, 0, 86400000), attempt: int(e.attempt, 0, 50),
-      detail: clip(e.detail, 120)
+      detail: safeDetail(e.detail),
+      event_id: identifier(e.event_id), session_id: identifier(e.session_id), incident_id: identifier(e.incident_id),
+      occurred_at: occurredAt(e.occurred_at),
+      phase: ['opening','playback','recovery'].includes(e.phase) ? e.phase : null,
+      media_error: nullableInt(e.media_error, 4), buffer_ms: nullableInt(e.buffer_ms, 86400000),
+      ready_state: nullableInt(e.ready_state, 4), network_state: nullableInt(e.network_state, 3),
+      engine: ['html5-native','avplay','roku','hlsjs'].includes(e.engine) ? e.engine : null,
+      device_model: /^[a-zA-Z0-9 ._-]{1,60}$/.test(String(e.device_model || '')) ? e.device_model : null
     });
   }
-  if (rows.length) await db('tv_playback_events', 'POST', rows);
+  if (rows.length) await db('tv_playback_events?on_conflict=device_hash,event_id', 'POST', rows);
   return { ok: true, stored: rows.length };
 }
 
