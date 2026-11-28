@@ -3,8 +3,7 @@
  if(!input||!platform)return;
  const raw=new URLSearchParams(location.search).get('codigo')||'';
  const code=raw.replace(/\s/g,'').toUpperCase();
- if(/^VD-/.test(code)){if(notice){notice.textContent='A plataforma VIDAA está desativada.';notice.hidden=false;input.parentElement.hidden=false;}return;}
- const target=/^WH-[0-9A-F]{12}$/.test(code)?'whale':/^TT-[0-9A-F]{12}$/.test(code)?'titan':/^IOS-[0-9A-F]{12}$/.test(code)?'ios':/^SM-[0-9A-F]{12}$/.test(code)?'samsung':/^LG-[0-9A-F]{12}$/.test(code)?'webos':null;
+ const target=/^VD-[0-9A-F]{12}$/.test(code)?'vidaa':/^WH-[0-9A-F]{12}$/.test(code)?'whale':/^TT-[0-9A-F]{12}$/.test(code)?'titan':/^IOS-[0-9A-F]{12}$/.test(code)?'ios':/^SM-[0-9A-F]{12}$/.test(code)?'samsung':/^LG-[0-9A-F]{12}$/.test(code)?'webos':null;
  if(!target)return;
  platform.value=target;platform.dispatchEvent(new Event('change',{bubbles:true}));input.value=code;input.dispatchEvent(new Event('input',{bubbles:true}));
  if(notice)notice.hidden=false;
